@@ -23,7 +23,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>	
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -45,6 +45,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Yaqin atrofdagi Minor Somsa filiallarini topish uchun joylashuv kerak</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Yaqin atrofdagi Minor Somsa filiallarini topish uchun joylashuv kerak</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Profil rasmini kamera orqali olish uchun ruxsat kerak</string>
 	<key>NSPhotoLibraryUsageDescription</key>

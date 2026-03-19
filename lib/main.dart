@@ -161,43 +161,57 @@ class _WebViewPageState extends State<WebViewPage> {
       params = WebKitWebViewControllerCreationParams(
         allowsInlineMediaPlayback: true,
         mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+        limitsNavigationsToAppBoundDomains: false,
       );
     } else {
       params = const PlatformWebViewControllerCreationParams();
     }
 
+    // Controller ni URL yuklamasdan init qilamiz
     _controller = WebViewController.fromPlatformCreationParams(params)
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
             if (mounted) {
-            setState(() {
-              _isLoading = true;
-            });
+              setState(() {
+                _isLoading = true;
+              });
             }
           },
           onPageFinished: (String url) {
             if (mounted) {
-            setState(() {
-              _isLoading = false;
-            });
+              setState(() {
+                _isLoading = false;
+              });
             }
           },
         ),
-      )
-      ..loadRequest(Uri.parse('https://minorsomsa.com/ru'));
+      );
 
     // Platform-specific setup
     if (Platform.isAndroid) {
       if (_controller.platform is AndroidWebViewController) {
-        final androidController = _controller.platform as AndroidWebViewController;
+        final androidController =
+            _controller.platform as AndroidWebViewController;
         await androidController.setMediaPlaybackRequiresUserGesture(false);
+        await androidController.setGeolocationEnabled(true);
+        androidController.setGeolocationPermissionsPromptCallbacks(
+          onShowPrompt: (GeolocationPermissionsRequestParams params) async {
+            final status = await Permission.locationWhenInUse.request();
+            return GeolocationPermissionsResponse(
+              allow: status.isGranted,
+              retain: false,
+            );
+          },
+          onHidePrompt: () {},
+        );
       }
       // Setup file handler for Android only
       _setupFileHandler();
     }
-    // iOS uchun - default web dialog ishlatadi
+
+    await _controller.loadRequest(Uri.parse('https://minorsomsa.com/ru'));
   }
 
   void _setupFileHandler() {
@@ -463,11 +477,11 @@ class _WebViewPageState extends State<WebViewPage> {
       ),
       builder: (BuildContext context) {
         return SafeArea(
-        child: Padding(
+          child: Padding(
             padding: const EdgeInsets.all(16.0),
-          child: Column(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
-            children: [
+              children: [
                 Container(
                   width: 40,
                   height: 4,
@@ -479,7 +493,7 @@ class _WebViewPageState extends State<WebViewPage> {
                 ),
                 const Text(
                   'Rasm tanlash',
-                style: TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -525,9 +539,9 @@ class _WebViewPageState extends State<WebViewPage> {
                   onTap: () => Navigator.pop(context, ImageSource.gallery),
                 ),
                 const SizedBox(height: 10),
-            ],
+              ],
+            ),
           ),
-        ),
         );
       },
     );
@@ -592,13 +606,13 @@ class _WebViewPageState extends State<WebViewPage> {
             WebViewWidget(controller: _controller),
             if (_isLoading)
               Container(
-                  color: Colors.white,
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Color.fromRGBO(212, 53, 42, 1),
-                    ),
+                color: Colors.white,
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: Color.fromRGBO(212, 53, 42, 1),
                   ),
-            ),
+                ),
+              ),
           ],
         ),
       ),
