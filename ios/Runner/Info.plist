@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Minor Somsa</string>
+	<string>Agro365</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>minor_somsa</string>
+	<string>Agro365</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -46,9 +46,9 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Yaqin atrofdagi Minor Somsa filiallarini topish uchun joylashuv kerak</string>
+	<string>Yaqin atrofdagi Agro365 filiallarini topish uchun joylashuv kerak</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Yaqin atrofdagi Minor Somsa filiallarini topish uchun joylashuv kerak</string>
+	<string>Yaqin atrofdagi Agro365 filiallarini topish uchun joylashuv kerak</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Profil rasmini kamera orqali olish uchun ruxsat kerak</string>
 	<key>NSPhotoLibraryUsageDescription</key>

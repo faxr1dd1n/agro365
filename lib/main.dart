@@ -8,6 +8,15 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+/// Logo palitrasi: "agro" — chuqur yashil, "365" — yorqin qizil.
+class Agro365Colors {
+  Agro365Colors._();
+
+  static const Color brandGreen = Color(0xFF1B4332);
+  static const Color brandRed = Color(0xFFE53935);
+  static const Color splashBackground = Colors.white;
+}
+
 void main() {
   runApp(const MyApp());
 }
@@ -28,9 +37,9 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Minor Somsa',
+      title: 'Agro365',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Agro365Colors.brandGreen),
         useMaterial3: true,
       ),
       home: const SplashScreen(),
@@ -47,88 +56,59 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _fadeAnimation;
+  /// iOS `LaunchImage` 1x uchun ishlatilgan `sips -Z 280` bilan bir xil nominal o‘lcham.
+  static const double _splashLogoLogical = 280;
+
+  late final AnimationController _exitController;
+  late final Animation<double> _exitOpacity;
 
   @override
   void initState() {
     super.initState();
-
-    // Animation controller
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+    _exitController = AnimationController(
+      duration: const Duration(milliseconds: 320),
       vsync: this,
     );
-
-    // Scale animation - kichikdan kattaga
-    _scaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutBack,
-      ),
+    _exitOpacity = Tween<double>(begin: 1, end: 0).animate(
+      CurvedAnimation(parent: _exitController, curve: Curves.easeOut),
     );
-
-    // Fade animation - ko'rinmas holatdan ko'rinishga
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeIn,
-      ),
-    );
-
-    // Animatsiyani boshlash
-    _controller.forward();
-
-    _navigateToHome();
+    _runSplashSequence();
   }
 
-  Future<void> _navigateToHome() async {
+  Future<void> _runSplashSequence() async {
     await Future.delayed(const Duration(seconds: 3));
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const WebViewPage()),
-      );
-    }
+    if (!mounted) return;
+    await _exitController.forward();
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder<void>(
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const WebViewPage(),
+      ),
+    );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _exitController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(237, 27, 37, 1),
+      backgroundColor: Agro365Colors.splashBackground,
       body: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: Opacity(
-                opacity: _fadeAnimation.value,
-                child: child,
-              ),
-            );
-          },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: Image.asset(
-              'assets/logo/minor_somsa_logo.jpg',
-              width: 250,
-              height: 250,
-              fit: BoxFit.cover,
-            ),
+        child: FadeTransition(
+          opacity: _exitOpacity,
+          child: Image.asset(
+            'assets/logo/agro365.jpg',
+            width: _splashLogoLogical,
+            height: _splashLogoLogical,
+            fit: BoxFit.contain,
           ),
         ),
       ),
@@ -211,7 +191,7 @@ class _WebViewPageState extends State<WebViewPage> {
       _setupFileHandler();
     }
 
-    await _controller.loadRequest(Uri.parse('https://minorsomsa.com/ru'));
+    await _controller.loadRequest(Uri.parse('https://agro-365.uz/'));
   }
 
   void _setupFileHandler() {
@@ -450,7 +430,7 @@ class _WebViewPageState extends State<WebViewPage> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(212, 53, 42, 1),
+                backgroundColor: Agro365Colors.brandGreen,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -503,12 +483,12 @@ class _WebViewPageState extends State<WebViewPage> {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color.fromRGBO(212, 53, 42, 0.1),
+                      color: Agro365Colors.brandGreen.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.camera_alt,
-                      color: Color.fromRGBO(212, 53, 42, 1),
+                      color: Agro365Colors.brandGreen,
                     ),
                   ),
                   title: const Text(
@@ -523,12 +503,12 @@ class _WebViewPageState extends State<WebViewPage> {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color.fromRGBO(212, 53, 42, 0.1),
+                      color: Agro365Colors.brandGreen.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.photo_library,
-                      color: Color.fromRGBO(212, 53, 42, 1),
+                      color: Agro365Colors.brandGreen,
                     ),
                   ),
                   title: const Text(
@@ -589,7 +569,7 @@ class _WebViewPageState extends State<WebViewPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Rasm yuklandi!'),
-          backgroundColor: Colors.green,
+          backgroundColor: Agro365Colors.brandGreen,
           duration: Duration(seconds: 2),
         ),
       );
@@ -609,7 +589,7 @@ class _WebViewPageState extends State<WebViewPage> {
                 color: Colors.white,
                 child: const Center(
                   child: CircularProgressIndicator(
-                    color: Color.fromRGBO(212, 53, 42, 1),
+                    color: Agro365Colors.brandGreen,
                   ),
                 ),
               ),

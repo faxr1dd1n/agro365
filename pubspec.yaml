@@ -1,4 +1,4 @@
-name: minor_somsa
+name: agro365
 description: "A new Flutter project."
 publish_to: 'none' 
 
@@ -36,7 +36,7 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/logo/minor_somsa_logo.jpg"
+  image_path: "assets/logo/agro365.jpg"
   min_sdk_android: 21
 
   # fonts:

@@ -43,3 +43,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Android signing
+android/key.properties
+**/*.jks
+**/*.keystore
+
+# iOS signing/certs
+**/*.p12
+**/*.mobileprovision
+**/*.cer
+
+# Firebase (agar keyin qo'shsangiz)
+**/google-services.json
+**/GoogleService-Info.plist
