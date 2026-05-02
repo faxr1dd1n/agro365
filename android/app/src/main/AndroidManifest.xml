@@ -10,7 +10,7 @@
         
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name="io.pixeel.agro365_app.MainActivity"
+            android:name="agro365.pixeel.io.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""

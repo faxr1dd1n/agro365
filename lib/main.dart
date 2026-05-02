@@ -8,13 +8,13 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-/// Logo palitrasi: "agro" — chuqur yashil, "365" — yorqin qizil.
+/// MinorSomsa bilan bir xil visual flow uchun asosiy ranglar.
 class Agro365Colors {
   Agro365Colors._();
 
-  static const Color brandGreen = Color(0xFF1B4332);
-  static const Color brandRed = Color(0xFFE53935);
-  static const Color splashBackground = Colors.white;
+  static const Color brandGreen = Color.fromRGBO(212, 53, 42, 1);
+  static const Color brandRed = Color.fromRGBO(212, 53, 42, 1);
+  static const Color splashBackground = Color.fromRGBO(237, 27, 37, 1);
 }
 
 void main() {
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Agro365',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Agro365Colors.brandGreen),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const SplashScreen(),
@@ -56,44 +56,43 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  /// iOS `LaunchImage` 1x uchun ishlatilgan `sips -Z 280` bilan bir xil nominal o‘lcham.
-  static const double _splashLogoLogical = 280;
-
-  late final AnimationController _exitController;
-  late final Animation<double> _exitOpacity;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    _exitController = AnimationController(
-      duration: const Duration(milliseconds: 320),
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _exitOpacity = Tween<double>(begin: 1, end: 0).animate(
-      CurvedAnimation(parent: _exitController, curve: Curves.easeOut),
+
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+
+    _controller.forward();
     _runSplashSequence();
   }
 
   Future<void> _runSplashSequence() async {
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) return;
-    await _exitController.forward();
-    if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      PageRouteBuilder<void>(
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const WebViewPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const WebViewPage()),
     );
   }
 
   @override
   void dispose() {
-    _exitController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -102,13 +101,25 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       backgroundColor: Agro365Colors.splashBackground,
       body: Center(
-        child: FadeTransition(
-          opacity: _exitOpacity,
-          child: Image.asset(
-            'assets/logo/agro365.jpg',
-            width: _splashLogoLogical,
-            height: _splashLogoLogical,
-            fit: BoxFit.contain,
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Opacity(
+                opacity: _fadeAnimation.value,
+                child: child,
+              ),
+            );
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Image.asset(
+              'assets/logo/agro365.jpg',
+              width: 250,
+              height: 250,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
@@ -191,7 +202,7 @@ class _WebViewPageState extends State<WebViewPage> {
       _setupFileHandler();
     }
 
-    await _controller.loadRequest(Uri.parse('https://agro-365.uz/'));
+    await _controller.loadRequest(Uri.parse('https://agro-365.uz/ru'));
   }
 
   void _setupFileHandler() {

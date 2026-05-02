@@ -1,4 +1,4 @@
-package io.pixeel.agro365_app
+package agro365.pixeel.io
 
 import io.flutter.embedding.android.FlutterActivity
 
