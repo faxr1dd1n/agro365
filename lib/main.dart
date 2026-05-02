@@ -8,13 +8,13 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-/// MinorSomsa bilan bir xil visual flow uchun asosiy ranglar.
+/// Agro365 uchun asosiy ranglar.
 class Agro365Colors {
   Agro365Colors._();
 
-  static const Color brandGreen = Color.fromRGBO(212, 53, 42, 1);
-  static const Color brandRed = Color.fromRGBO(212, 53, 42, 1);
-  static const Color splashBackground = Color.fromRGBO(237, 27, 37, 1);
+  static const Color brandGreen = Color(0xFF1B4332);
+  static const Color brandRed = Color(0xFFE53935);
+  static const Color splashBackground = Colors.white;
 }
 
 void main() {
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Agro365',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Agro365Colors.brandGreen),
         useMaterial3: true,
       ),
       home: const SplashScreen(),
