@@ -136,7 +136,7 @@ class WebViewPage extends StatefulWidget {
 
 class _WebViewPageState extends State<WebViewPage> {
   late final WebViewController _controller;
-  bool _isLoading = true;
+  bool _showSplashUntilFirstPage = true;
   final ImagePicker _imagePicker = ImagePicker();
 
   @override
@@ -163,19 +163,11 @@ class _WebViewPageState extends State<WebViewPage> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (String url) {
-            if (mounted) {
-              setState(() {
-                _isLoading = true;
-              });
-            }
-          },
-          onPageFinished: (String url) {
-            if (mounted) {
-              setState(() {
-                _isLoading = false;
-              });
-            }
+          onPageFinished: (_) {
+            if (!mounted || !_showSplashUntilFirstPage) return;
+            setState(() {
+              _showSplashUntilFirstPage = false;
+            });
           },
         ),
       );
@@ -595,12 +587,17 @@ class _WebViewPageState extends State<WebViewPage> {
         child: Stack(
           children: [
             WebViewWidget(controller: _controller),
-            if (_isLoading)
+            if (_showSplashUntilFirstPage)
               Container(
                 color: Colors.white,
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Agro365Colors.brandGreen,
+                alignment: Alignment.center,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: Image.asset(
+                    'assets/logo/agro365.jpg',
+                    width: 250,
+                    height: 250,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
