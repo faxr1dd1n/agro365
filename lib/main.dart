@@ -42,87 +42,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Agro365Colors.brandGreen),
         useMaterial3: true,
       ),
-      home: const SplashScreen(),
-    );
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
-
-    _controller.forward();
-    _runSplashSequence();
-  }
-
-  Future<void> _runSplashSequence() async {
-    await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const WebViewPage()),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Agro365Colors.splashBackground,
-      body: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: Opacity(
-                opacity: _fadeAnimation.value,
-                child: child,
-              ),
-            );
-          },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: Image.asset(
-              'assets/logo/agro365.jpg',
-              width: 250,
-              height: 250,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-      ),
+      home: const WebViewPage(),
     );
   }
 }
@@ -134,15 +54,54 @@ class WebViewPage extends StatefulWidget {
   State<WebViewPage> createState() => _WebViewPageState();
 }
 
-class _WebViewPageState extends State<WebViewPage> {
+class _WebViewPageState extends State<WebViewPage>
+    with SingleTickerProviderStateMixin {
   late final WebViewController _controller;
   bool _showSplashUntilFirstPage = true;
   final ImagePicker _imagePicker = ImagePicker();
+  late final DateTime _splashMinVisibleUntil;
+  bool _isHidingSplash = false;
+  late final AnimationController _splashController;
+  late final Animation<double> _splashScaleAnimation;
+  late final Animation<double> _splashFadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    _splashMinVisibleUntil = DateTime.now().add(const Duration(seconds: 2));
+    _splashController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _splashScaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _splashController, curve: Curves.easeOutBack),
+    );
+    _splashFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _splashController, curve: Curves.easeIn),
+    );
+    _splashController.forward();
     _initializeWebView();
+  }
+
+  Future<void> _hideSplashAfterMinimumDuration() async {
+    if (!_showSplashUntilFirstPage || _isHidingSplash) return;
+    _isHidingSplash = true;
+
+    final remaining = _splashMinVisibleUntil.difference(DateTime.now());
+    if (remaining > Duration.zero) {
+      await Future.delayed(remaining);
+    }
+
+    if (!mounted || !_showSplashUntilFirstPage) return;
+    setState(() {
+      _showSplashUntilFirstPage = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _splashController.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeWebView() async {
@@ -164,10 +123,7 @@ class _WebViewPageState extends State<WebViewPage> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (_) {
-            if (!mounted || !_showSplashUntilFirstPage) return;
-            setState(() {
-              _showSplashUntilFirstPage = false;
-            });
+            _hideSplashAfterMinimumDuration();
           },
         ),
       );
@@ -582,22 +538,35 @@ class _WebViewPageState extends State<WebViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:_showSplashUntilFirstPage? Agro365Colors.splashBackground:Colors.white,
       body: SafeArea(
         child: Stack(
           children: [
             WebViewWidget(controller: _controller),
             if (_showSplashUntilFirstPage)
               Container(
-                color: Colors.white,
-                alignment: Alignment.center,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: Image.asset(
-                    'assets/logo/agro365.jpg',
-                    width: 250,
-                    height: 250,
-                    fit: BoxFit.cover,
+                color: Agro365Colors.splashBackground,
+                child: Center(
+                  child: AnimatedBuilder(
+                    animation: _splashController,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _splashScaleAnimation.value,
+                        child: Opacity(
+                          opacity: _splashFadeAnimation.value,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: Image.asset(
+                        'assets/logo/agro365.jpg',
+                        width: 250,
+                        height: 250,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
               ),
