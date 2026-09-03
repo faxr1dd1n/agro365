@@ -150,7 +150,8 @@ class _WebViewPageState extends State<WebViewPage>
       _setupFileHandler();
     }
 
-    await _controller.loadRequest(Uri.parse('https://agro-365.uz/ru'));
+    await _controller
+        .loadRequest(Uri.parse('https://agro-365.uz/ru?hide-mobile-links=1'));
   }
 
   void _setupFileHandler() {
@@ -538,7 +539,9 @@ class _WebViewPageState extends State<WebViewPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:_showSplashUntilFirstPage? Agro365Colors.splashBackground:Colors.white,
+      backgroundColor: _showSplashUntilFirstPage
+          ? Agro365Colors.splashBackground
+          : Colors.white,
       body: SafeArea(
         child: Stack(
           children: [
